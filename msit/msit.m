@@ -3,6 +3,7 @@
 % January, 2019
 % Based on PsychoPy code by Cameron Craddock: http://opencoglabrepository.github.io/experiment_msit.html
 
+%{
 %% Standard pre-script code
 close all; clear all; clc; % Clear everything
 rng('shuffle'); % Shuffle the random number generator
@@ -278,3 +279,5 @@ catch e
     
     rethrow(e);
 end
+
+%}
