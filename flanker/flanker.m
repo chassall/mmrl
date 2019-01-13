@@ -177,58 +177,61 @@ try
             startTime = GetSecs();
             while GetSecs() - startTime < 1.250 % ISI??
                 
-                if useResponseBox
-                    evt = CMUBox('GetEvent', handle);
-                    if ~isempty(evt) && evt.state
-                        madeResponse = 1;
-                        pressTime = evt.time;
-                        srBoxCode = evt.state;
-                        
-%                         % Wait for button release (Is this the right
-%                         % place??)
-%                         evt = CMUBox('GetEvent', handle);
-%                         while isempty(evt) || evt.state ~= 0
-%                             evt = CMUBox('GetEvent', handle);
-%                         end
-                    end
-                else
-                    [madeResponse, pressTime, keyCode] = KbCheck(-1);
-                end
-                
-                if madeResponse
-                    responseTime  = pressTime - startTime;
+                if ~madeResponse
                     
                     if useResponseBox
-                        if  srBoxCode == whichResponseCodes(1)
-                            responseCode = 1;
-                        elseif srBoxCode == whichResponseCodes(2)
-                            responseCode = 2;
+                        evt = CMUBox('GetEvent', handle);
+                        if ~isempty(evt) && evt.state
+                            madeResponse = 1;
+                            pressTime = evt.time;
+                            srBoxCode = evt.state;
+                            
+                            %                         % Wait for button release (Is this the right
+                            %                         % place??)
+                            %                         evt = CMUBox('GetEvent', handle);
+                            %                         while isempty(evt) || evt.state ~= 0
+                            %                             evt = CMUBox('GetEvent', handle);
+                            %                         end
                         end
                     else
-                        if  keyCode(left_kb_key)
-                            responseCode = 1;
-                        elseif keyCode(right_kb_key)
-                            responseCode = 2;
+                        [madeResponse, pressTime, keyCode] = KbCheck(-1);
+                    end
+                    
+                    if madeResponse
+                        responseTime  = pressTime - startTime;
+                        
+                        if useResponseBox
+                            if  srBoxCode == whichResponseCodes(1)
+                                responseCode = 1;
+                            elseif srBoxCode == whichResponseCodes(2)
+                                responseCode = 2;
+                            end
+                        else
+                            if  keyCode(left_kb_key)
+                                responseCode = 1;
+                            elseif keyCode(right_kb_key)
+                                responseCode = 2;
+                            end
+                            
                         end
                         
-                    end
-                    
-                    if  responseCode == 1
-                        if thisCorrectResponse == 1
-                            responseCorrect = 1;
-                        else
-                            responseCorrect = 0;
+                        if  responseCode == 1
+                            if thisCorrectResponse == 1
+                                responseCorrect = 1;
+                            else
+                                responseCorrect = 0;
+                            end
+                        elseif responseCode == 2
+                            if thisCorrectResponse == 0
+                                responseCorrect = 1;
+                            else
+                                responseCorrect = 0;
+                            end
                         end
-                    elseif responseCode == 2
-                        if thisCorrectResponse == 0
-                            responseCorrect = 1;
-                        else
-                            responseCorrect = 0;
-                        end
+                        
+                        DrawFormattedText(win,thisTrialString,'center','center',[192 192 192]); % Change colour to silver
+                        Screen('Flip',win);
                     end
-                    
-                    DrawFormattedText(win,thisTrialString,'center','center',[192 192 192]); % Change colour to silver
-                    Screen('Flip',win);
                 end
             end
             

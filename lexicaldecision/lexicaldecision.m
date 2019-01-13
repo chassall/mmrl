@@ -18,10 +18,10 @@ ProceedKey = KbName('p');
 left_kb_key	= KbName('f');
 right_kb_key = KbName('j');
 
-%% Response box 
+%% Response box
 try
     disp('Attempting to connect to response box...');
-    handle = CMUBox('Open', 'pst', 'COM4', 'ftdi','norelease'); 
+    handle = CMUBox('Open', 'pst', 'COM4', 'ftdi','norelease');
     disp('Success!');
     WaitSecs(1);
     useResponseBox = 1;
@@ -31,11 +31,11 @@ catch e
     disp('Connection failed. Press p to proceed with keyboard input (f-key, j-key), or press escape to quit.');
     useResponseBox = 0;
     inputDevice = 'kb';
-
+    
     % Check for escape key
     KbReleaseWait(-1);
     [~, keyCode, ~] = KbPressWait(-1);
-    while ~keyCode(ExitKey) && ~keyCode(ProceedKey) 
+    while ~keyCode(ExitKey) && ~keyCode(ProceedKey)
         [~, keyCode, ~] = KbPressWait(-1);
     end
     if keyCode(ExitKey)
@@ -92,70 +92,70 @@ textColour = [255 255 255];
 fixationSize = 48; % Size for fixation '+'
 fixationCharacter = '+';
 stimSize = 48; % Size for stimuli
-    practiceWords = {'garage',1; 'neefle',2};
-    experimentWords{1} = {'cities',	1;...
-'hestory',	2;...
-'offace',	2;...
-'trees',	1;...
-'forpe',	2;...
-'dictor',	2;...
-'niture',	2;...
-'college',	1;...
-'fither',	2;...
-'unian',	2;...
-'degree',	1;...
-'design',	1;...
-'sulport',	2;...
-'nabion',	2;...
-'persol',	2;...
-'truth',	1;...
-'record',	1;...
-'points',	1;...
-'repert',	2;...
-'words',	1};
+practiceWords = {'garage',1; 'neefle',2};
+experimentWords{1} = {'cities',	1;...
+    'hestory',	2;...
+    'offace',	2;...
+    'trees',	1;...
+    'forpe',	2;...
+    'dictor',	2;...
+    'niture',	2;...
+    'college',	1;...
+    'fither',	2;...
+    'unian',	2;...
+    'degree',	1;...
+    'design',	1;...
+    'sulport',	2;...
+    'nabion',	2;...
+    'persol',	2;...
+    'truth',	1;...
+    'record',	1;...
+    'points',	1;...
+    'repert',	2;...
+    'words',	1};
 
 experimentWords{2} = {'surface',	1;...
-'ranje',	2;...
-'hours',	1;...
-'example',	1;...
-'result',	1;...
-'narket',	2;...
-'island',	1;...
-'spirit',	1;...
-'student',	1;...
-'palice',	2;...
-'seption',	2;...
-'leater',	2;...
-'south',	1;...
-'method',	1;...
-'weefs',	2;...
-'velume',	2;...
-'sammer',	2;...
-'mouth',	1;...
-'attack',	1;...
-'trian',	2};
+    'ranje',	2;...
+    'hours',	1;...
+    'example',	1;...
+    'result',	1;...
+    'narket',	2;...
+    'island',	1;...
+    'spirit',	1;...
+    'student',	1;...
+    'palice',	2;...
+    'seption',	2;...
+    'leater',	2;...
+    'south',	1;...
+    'method',	1;...
+    'weefs',	2;...
+    'velume',	2;...
+    'sammer',	2;...
+    'mouth',	1;...
+    'attack',	1;...
+    'trian',	2};
 
 
 experimentWords{3} = {'husband',	1;...
-'sciense',	2;...
-'centre',	1;...
-'manth',	2;...
-'future',	1;...
-'siries',	2;...
-'plant',	1;...
-'pross',	2;...
-'seesan',	2;...
-'windal',	2;...
-'front',	1;...
-'encome',	2;...
-'music',	1;...
-'class',	1;...
-'seltion',	2;...
-'teath',	2;...
-'corner',	1;...
-'pappern',	2;...
-'months',	1;...
-'effort',	1};
+    'sciense',	2;...
+    'centre',	1;...
+    'manth',	2;...
+    'future',	1;...
+    'siries',	2;...
+    'plant',	1;...
+    'pross',	2;...
+    'seesan',	2;...
+    'windal',	2;...
+    'front',	1;...
+    'encome',	2;...
+    'music',	1;...
+    'class',	1;...
+    'seltion',	2;...
+    'teath',	2;...
+    'corner',	1;...
+    'pappern',	2;...
+    'months',	1;...
+    'effort',	1};
 
 textSize = 24; % Size for instructions and block messages
 
@@ -238,56 +238,58 @@ try
         startTime = GetSecs();
         while ~madeResponse && GetSecs() - startTime < 5 % ISI of 5??
             
-            if useResponseBox
-                evt = CMUBox('GetEvent', handle);
-                if ~isempty(evt) && evt.state
-                    madeResponse = 1;
-                    pressTime = evt.time;
-                    srBoxCode = evt.state;
-                    
-%                     % Wait for button release (Is this the right
-%                     % place??)
-%                     evt = CMUBox('GetEvent', handle);
-%                     while isempty(evt) || evt.state ~= 0
-%                         evt = CMUBox('GetEvent', handle);
-%                     end
-                end
-            else
-                [madeResponse, pressTime, keyCode] = KbCheck(-1);
-            end
-            
-            if madeResponse
-                responseTime  = pressTime - startTime;
-                
+            if ~madeResponse
                 if useResponseBox
-                    if  srBoxCode == whichResponseCodes(1)
-                        responseCode = 1;
-                    elseif srBoxCode == whichResponseCodes(2)
-                        responseCode = 2;
+                    evt = CMUBox('GetEvent', handle);
+                    if ~isempty(evt) && evt.state
+                        madeResponse = 1;
+                        pressTime = evt.time;
+                        srBoxCode = evt.state;
+                        
+                        %                     % Wait for button release (Is this the right
+                        %                     % place??)
+                        %                     evt = CMUBox('GetEvent', handle);
+                        %                     while isempty(evt) || evt.state ~= 0
+                        %                         evt = CMUBox('GetEvent', handle);
+                        %                     end
                     end
                 else
-                    if  keyCode(left_kb_key)
-                        responseCode = 1;
-                    elseif keyCode(right_kb_key)
-                        responseCode = 2;
+                    [madeResponse, pressTime, keyCode] = KbCheck(-1);
+                end
+                
+                if madeResponse
+                    responseTime  = pressTime - startTime;
+                    
+                    if useResponseBox
+                        if  srBoxCode == whichResponseCodes(1)
+                            responseCode = 1;
+                        elseif srBoxCode == whichResponseCodes(2)
+                            responseCode = 2;
+                        end
+                    else
+                        if  keyCode(left_kb_key)
+                            responseCode = 1;
+                        elseif keyCode(right_kb_key)
+                            responseCode = 2;
+                        end
+                        
+                    end
+                    
+                    if  responseCode == 1
+                        if thisCorrectResponse == 1
+                            responseCorrect = 1;
+                        else
+                            responseCorrect = 0;
+                        end
+                    elseif responseCode == 2
+                        if thisCorrectResponse == 2
+                            responseCorrect = 1;
+                        else
+                            responseCorrect = 0;
+                        end
                     end
                     
                 end
-                
-                if  responseCode == 1
-                    if thisCorrectResponse == 1
-                        responseCorrect = 1;
-                    else
-                        responseCorrect = 0;
-                    end
-                elseif responseCode == 2
-                    if thisCorrectResponse == 2
-                        responseCorrect = 1;
-                    else
-                        responseCorrect = 0;
-                    end
-                end
-                
             end
         end
         
@@ -304,7 +306,7 @@ try
     end
     
     % Block/trial loop
-    for blockNum = 1:nBlocks    
+    for blockNum = 1:nBlocks
         
         Screen('TextSize',win,textSize);
         DrawFormattedText(win,'Let''s begin! \n\nWhen you are ready, press any key to continue.','center','center',textColour);
@@ -314,106 +316,108 @@ try
         
         for trialNum = 1:trialsPerBlock
             
-        thisWord = experimentWords{blockNum}{trialNum,1};
-        thisCorrectResponse = experimentWords{blockNum}{trialNum,2};
-        
-        KbReleaseWait(-1);
-        
-        Screen('Flip',win);
-        WaitSecs(0.75);
-        
-        Screen(win,'TextFont','Arial');
-        Screen(win,'TextSize',fixationSize);
-        DrawFormattedText(win,fixationCharacter,'center','center',textColour);
-        Screen('Flip',win);
-        WaitSecs(0.75);
-        
-        Screen('Flip',win);
-        WaitSecs(0.5);
-        
-        % Clear event buffer if using the response box
-        if useResponseBox
-            evt = CMUBox('GetEvent', handle);
-            while ~isempty(evt)
-                evt = CMUBox('GetEvent', handle);
-            end
-        end
-        
-        Screen(win,'TextFont','Arial');
-        Screen(win,'TextSize',stimSize);
-        DrawFormattedText(win,thisWord,'center','center',textColour);
-        Screen('Flip',win);
-        
-        % Get response
-        madeResponse = 0;
-        responseCode = -1; % Invalid response
-        responseCorrect = -1; % Invalid response
-        responseTime = -1;
-        startTime = GetSecs();
-        while ~madeResponse && GetSecs() - startTime < 5 % ISI of 5??
+            thisWord = experimentWords{blockNum}{trialNum,1};
+            thisCorrectResponse = experimentWords{blockNum}{trialNum,2};
+            
+            KbReleaseWait(-1);
+            
+            Screen('Flip',win);
+            WaitSecs(0.75);
+            
+            Screen(win,'TextFont','Arial');
+            Screen(win,'TextSize',fixationSize);
+            DrawFormattedText(win,fixationCharacter,'center','center',textColour);
+            Screen('Flip',win);
+            WaitSecs(0.75);
+            
+            Screen('Flip',win);
+            WaitSecs(0.5);
+            
+            % Clear event buffer if using the response box
             if useResponseBox
                 evt = CMUBox('GetEvent', handle);
-                if ~isempty(evt) && evt.state
-                    madeResponse = 1;
-                    pressTime = evt.time;
-                    srBoxCode = evt.state;
-                    
-                    % Wait for button release (Is this the right
-                    % place??)
+                while ~isempty(evt)
                     evt = CMUBox('GetEvent', handle);
-                    while isempty(evt) || evt.state ~= 0
-                        evt = CMUBox('GetEvent', handle);
-                    end
                 end
-            else
-                [madeResponse, pressTime, keyCode] = KbCheck(-1);
             end
             
-            if madeResponse
-                responseTime  = pressTime - startTime;
-                
-                if useResponseBox
-                    if  srBoxCode == whichResponseCodes(1)
-                        responseCode = 1;
-                    elseif srBoxCode == whichResponseCodes(2)
-                        responseCode = 2;
-                    end
-                else
-                    if  keyCode(left_kb_key)
-                        responseCode = 1;
-                    elseif keyCode(right_kb_key)
-                        responseCode = 2;
+            Screen(win,'TextFont','Arial');
+            Screen(win,'TextSize',stimSize);
+            DrawFormattedText(win,thisWord,'center','center',textColour);
+            Screen('Flip',win);
+            
+            % Get response
+            madeResponse = 0;
+            responseCode = -1; % Invalid response
+            responseCorrect = -1; % Invalid response
+            responseTime = -1;
+            startTime = GetSecs();
+            while ~madeResponse && GetSecs() - startTime < 5 % ISI of 5??
+                if ~madeResonse % Redundant
+                    if useResponseBox
+                        evt = CMUBox('GetEvent', handle);
+                        if ~isempty(evt) && evt.state
+                            madeResponse = 1;
+                            pressTime = evt.time;
+                            srBoxCode = evt.state;
+                            
+                            % Wait for button release (Is this the right
+                            % place??)
+                            evt = CMUBox('GetEvent', handle);
+                            while isempty(evt) || evt.state ~= 0
+                                evt = CMUBox('GetEvent', handle);
+                            end
+                        end
+                    else
+                        [madeResponse, pressTime, keyCode] = KbCheck(-1);
                     end
                     
-                end
-                
-                if  responseCode == 1
-                    if thisCorrectResponse == 1
-                        responseCorrect = 1;
-                    else
-                        responseCorrect = 0;
+                    if madeResponse
+                        responseTime  = pressTime - startTime;
+                        
+                        if useResponseBox
+                            if  srBoxCode == whichResponseCodes(1)
+                                responseCode = 1;
+                            elseif srBoxCode == whichResponseCodes(2)
+                                responseCode = 2;
+                            end
+                        else
+                            if  keyCode(left_kb_key)
+                                responseCode = 1;
+                            elseif keyCode(right_kb_key)
+                                responseCode = 2;
+                            end
+                            
+                        end
+                        
+                        if  responseCode == 1
+                            if thisCorrectResponse == 1
+                                responseCorrect = 1;
+                            else
+                                responseCorrect = 0;
+                            end
+                        elseif responseCode == 2
+                            if thisCorrectResponse == 2
+                                responseCorrect = 1;
+                            else
+                                responseCorrect = 0;
+                            end
+                        end
+                        
                     end
-                elseif responseCode == 2
-                    if thisCorrectResponse == 2
-                        responseCorrect = 1;
-                    else
-                        responseCorrect = 0;
-                    end
                 end
-                
             end
-        end
-        
-        if responseCorrect == -1
-            DrawFormattedText(win,'invalid response','center','center',textColour);
-        elseif responseCorrect == 0
-            DrawFormattedText(win,'no','center','center',textColour);
-        elseif responseCorrect == 1
-            DrawFormattedText(win,'correct','center','center',textColour);
-        end
-        Screen('Flip',win);
-        WaitSecs(2);
-                         
+            
+            if responseCorrect == -1
+                DrawFormattedText(win,'invalid response','center','center',textColour);
+            elseif responseCorrect == 0
+                DrawFormattedText(win,'no','center','center',textColour);
+            elseif responseCorrect == 1
+                DrawFormattedText(win,'correct','center','center',textColour);
+            end
+            Screen('Flip',win);
+            WaitSecs(2);
+            
             thisLine = [blockNum trialNum thisCorrectResponse madeResponse responseCode responseTime responseCorrect];
             dlmwrite(filename,thisLine,'delimiter', '\t', '-append');
             participantData = [participantData; thisLine];
@@ -452,7 +456,7 @@ try
     if useResponseBox
         CMUBox('Close', handle);
     end
-
+    
     experimentTime = toc;
     disp(experimentTime);
     

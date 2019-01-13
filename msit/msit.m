@@ -2,16 +2,23 @@
 % C. Hassall
 % January, 2019
 % Based on PsychoPy code by Cameron Craddock: http://opencoglabrepository.github.io/experiment_msit.html
+%
+% Outstanding issues:
+% Blocked or mixed
+% X's or 0's
+% Target size condition (big/small)
+% Fixation/rest periods
+% Practice trials
+% Rest breaks
 
-%{
 %% Standard pre-script code
 close all; clear all; clc; % Clear everything
 rng('shuffle'); % Shuffle the random number generator
 tic;
 
 %% Run flags
-justTesting = 0;
-windowed = 0;
+justTesting = 1;
+windowed = 1;
 
 %% Define control keys
 KbName('UnifyKeyNames');
@@ -19,25 +26,28 @@ ExitKey = KbName('ESCAPE');
 ProceedKey = KbName('p');
 left_kb_key	= KbName('f');
 right_kb_key = KbName('j');
+oneKey = KbName('1');
+twoKey = KbName('2');
+threeKey = KbName('3');
 
-%% Response box 
+%% Response box
 try
     disp('Attempting to connect to response box...');
-    handle = CMUBox('Open', 'pst', 'COM4', 'ftdi','norelease'); 
+    handle = CMUBox('Open', 'pst', 'COM4', 'ftdi','norelease');
     disp('Success!');
     WaitSecs(1);
     useResponseBox = 1;
     inputDevice = 'srb';
     whichResponseCodes = [1 2 4]; % Buttons 1,2,3
 catch e
-    disp('Connection failed. Press p to proceed with keyboard input (f-key, j-key), or press escape to quit.');
+    disp('Connection failed. Press p to proceed with keyboard input (1-key,2-key,3-key), or press escape to quit.');
     useResponseBox = 0;
     inputDevice = 'kb';
-
+    
     % Check for escape key
     KbReleaseWait(-1);
     [~, keyCode, ~] = KbPressWait(-1);
-    while ~keyCode(ExitKey) && ~keyCode(ProceedKey) 
+    while ~keyCode(ExitKey) && ~keyCode(ProceedKey)
         [~, keyCode, ~] = KbPressWait(-1);
     end
     if keyCode(ExitKey)
@@ -95,7 +105,6 @@ fixationSize = 48; % Size for fixation '+'
 stimISI = 1.75;
 fixationCharacter = '+';
 stimSize = 48; % Size for stimuli
-stimStrings = {'< < < < <','> > < > >','> > > > >','< < > < <'};
 stimColour = [255 255 255];
 correctResponses = [1 1 2 2]; % 1:left, 2:right
 textSize = 24; % Size for instructions and block messages
@@ -103,11 +112,13 @@ textSize = 24; % Size for instructions and block messages
 % Blocks, trials, trial types
 nBlocks = 8;
 trialsPerBlock = 24;
-all_control_stim=['100','020','003']; % Trials types 1,2,3
+controlStim={'100','020','003'}; % Trials types 1,2,3
+controlAnswers = [1 2 3];
 controlTypes = [1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3];
-all_int_stim=['221','212','331','313','112','211','332','233','131','311','232','322']; % Trial types 1-12
+interferenceStim={'221','212','331','313','112','211','332','233','131','311','232','322'}; % Trial types 1-12
+interferenceAnswers = [1 1 1 1 2 2 2 2 3 3 3 3];
 interferenceTypes = [1:12 1:12];
-blockType = [1 2 1 2 1 2 1 2]; % 1 = control, 2 = interference
+blockType = [1 2 1 2 1 2 1 2]; % 1 = control, 2 = interference, set order
 
 trialTypes = [];
 for b = 1:nBlocks
@@ -121,6 +132,7 @@ end
 
 % Instructions
 instructions{1} = 'Every few seconds, a set of three numbers (1, 2, 3, or 0)\nwill appear in the center of the screen.\nOne number will always be different from the other two.\nPress the button corresponding to the identity,\nnot the position, of the differing number.\nThe values corresponding to the buttons are:\nindex finger = 1, middle finger = 2, and ring finger = 3\nAnswer as accurately and quickly as possible.';
+instructions{2} = 'Press any key to begin experiment';
 
 %% Experiment
 try
@@ -155,11 +167,21 @@ try
     % Block/trial loop
     for blockNum = 1:nBlocks
         
+        thisBlockType = blockType(blockNum);
+        switch thisBlockType
+            case 1
+                theseStimuli = controlStim;
+                theseAnswers = controlAnswers;
+            case 2
+                theseStimuli = interferenceStim;
+                theseAnswers = interferenceAnswers;
+        end
+        
         for trialNum = 1:trialsPerBlock
             
-            thisTrialType = allTrialTypes(blockNum,trialNum);
-            thisTrialString = stimStrings{thisTrialType};
-            thisCorrectResponse = correctResponses(thisTrialType);
+            thisTrialType = trialTypes(blockNum,trialNum);
+            thisTrialString = theseStimuli{thisTrialType};
+            thisCorrectResponse = theseAnswers(thisTrialType);
             
             Screen(win,'TextFont','Arial');
             Screen(win,'TextSize',fixationSize);
@@ -186,33 +208,68 @@ try
             responseCorrect = -1; % Invalid response
             responseTime = -1;
             startTime = GetSecs();
-            while GetSecs() - startTime < 1.250 % ISI??
-                [madeResponse, secs, keyCode] = KbCheck(-1);
+            while GetSecs() - startTime < 1.75 %% ISI??
                 
-                if madeResponse
-                    responseTime  = GetSecs() - startTime;
-                    if  keyCode(left_kb_key)
-                        responseCode = 1;
-                        if thisCorrectResponse == 1
-                            responseCorrect = 1;
-                        else
-                            responseCorrect = 0;
+                if ~madeResponse
+                    
+                    if useResponseBox
+                        evt = CMUBox('GetEvent', handle);
+                        if ~isempty(evt) && evt.state
+                            madeResponse = 1;
+                            pressTime = evt.time;
+                            srBoxCode = evt.state;
                         end
-                    elseif keyCode(right_kb_key)
-                        responseCode = 2;
-                        if thisCorrectResponse == 0
-                            responseCorrect = 1;
-                        else
-                            responseCorrect = 0;
-                        end
+                    else
+                        [madeResponse, pressTime, keyCode] = KbCheck(-1);
                     end
                     
-                    DrawFormattedText(win,thisTrialString,'center','center',[192 192 192]); % Change colour to silver
-                    Screen('Flip',win);
+                    if madeResponse
+                        responseTime  = pressTime - startTime;
+                        
+                        if useResponseBox
+                            if  srBoxCode == whichResponseCodes(1)
+                                responseCode = 1;
+                            elseif srBoxCode == whichResponseCodes(2)
+                                responseCode = 2;
+                            elseif srBoxCode == whichResponseCodes(3)
+                                responseCode = 3;
+                            end
+                        else
+                            if  keyCode(oneKey)
+                                responseCode = 1;
+                            elseif keyCode(twoKey)
+                                responseCode = 2;
+                            elseif keyCode(threeKey)
+                                responseCode = 3;
+                            end
+                            
+                        end
+                        
+                        if  responseCode == 1
+                            if thisCorrectResponse == 1
+                                responseCorrect = 1;
+                            else
+                                responseCorrect = 0;
+                            end
+                        elseif responseCode == 2
+                            if thisCorrectResponse == 0
+                                responseCorrect = 1;
+                            else
+                                responseCorrect = 0;
+                            end
+                        elseif responseCode == 3
+                            if thisCorrectResponse == 3
+                                responseCorrect = 1;
+                            else
+                                responseCorrect = 0;
+                            end
+                        end
+                        Screen('Flip',win); % Blank screen
+                    end
                 end
             end
             
-            thisLine = [blockNum trialNum thisTrialType madeResponse responseCode responseTime responseCorrect];
+            thisLine = [blockNum trialNum thisBlockType thisTrialType madeResponse responseCode responseTime responseCorrect];
             dlmwrite(filename,thisLine,'delimiter', '\t', '-append');
             participantData = [participantData; thisLine];
             
@@ -279,5 +336,3 @@ catch e
     
     rethrow(e);
 end
-
-%}
