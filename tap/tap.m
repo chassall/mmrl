@@ -102,7 +102,7 @@ textSize = 24; % Size for instructions and block messages
 nBlocks = 6; % Number of blocks (should be a multiple of two)
 tapTime = 15; % Time in seconds
 blockTypes = [ones(1,nBlocks/2) 2*ones(1,nBlocks/2)]; % 1 = left, 2 = right
-blockTypes = shuffle(blockTypes);
+blockTypes = Shuffle(blockTypes);
 conditionStrings = {'left','LEFT'; 'right','RIGHT'};
 
 % Instructions
