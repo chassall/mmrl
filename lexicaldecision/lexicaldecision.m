@@ -353,7 +353,7 @@ try
             responseTime = -1;
             startTime = GetSecs();
             while ~madeResponse && GetSecs() - startTime < 5 % ISI of 5??
-                if ~madeResonse % Redundant
+                if ~madeResponse % Redundant
                     if useResponseBox
                         evt = CMUBox('GetEvent', handle);
                         if ~isempty(evt) && evt.state
