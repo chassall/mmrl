@@ -26,7 +26,7 @@ try
     WaitSecs(1);
     useResponseBox = 1;
     inputDevice = 'srb';
-    whichResponseCodes = [1 16]; % For left, right button (far left and right buttons on box)
+    whichResponseCodes = [1 2]; % Buttons A and B
 catch e
     disp('Connection failed. Press p to proceed with keyboard input (f-key, j-key), or press escape to quit.');
     useResponseBox = 0;
@@ -58,7 +58,6 @@ if justTesting
     rundate = datestr(now, 'yyyymmdd-HHMMSS');
     filename = strcat('lexicaldecision_', rundate, '_', p_number, '.txt');
     mfilename = strcat('lexicaldecision_', rundate, '_', p_number, '.mat');
-    sex = 'FM';
     age = '99';
     handedness = 'LR';
 else
@@ -77,21 +76,20 @@ else
             WaitSecs(1);
         end
     end
-    sex = input('Sex (M/F): ','s');
     age = input('Age: ');
     handedness = input('Handedness (L/R): ','s');
 end
 
 % Store this participant's info in participant_info.txt
-run_line = [num2str(p_number) ', ' datestr(now) ', ' sex ', ' handedness ', ' num2str(age) ', ' inputDevice];
+run_line = [num2str(p_number) ', ' datestr(now) ', ' handedness ', ' num2str(age) ', ' inputDevice];
 dlmwrite('lexicaldecisionparticipants.txt',run_line,'delimiter','', '-append');
 
 %% Run parameters
 bgColour = [0 0 0];
 textColour = [255 255 255];
-fixationSize = 48; % Size for fixation '+'
+fixationSize = 96; % Size for fixation '+'
 fixationCharacter = '+';
-stimSize = 48; % Size for stimuli
+stimSize = 96; % Size for stimuli
 practiceWords = {'garage',1; 'neefle',2};
 experimentWords{1} = {'cities',	1;...
     'hestory',	2;...
@@ -157,16 +155,16 @@ experimentWords{3} = {'husband',	1;...
     'months',	1;...
     'effort',	1};
 
-textSize = 24; % Size for instructions and block messages
+textSize = 48; % Size for instructions and block messages
 
 % Blocks, trials, trial types
 nBlocks = 3; % Number of blocks
 trialsPerBlock = 20; % Trials per block
 
 % Instructions
-instructions{1} = 'In the following task, you will be making judgments about\nsingle words.\n\nGroups of 5 to 7 letters will appear in the centre of the\nscreen and remain there for several seconds.  Your job is\nto decide as quickly as you can whether these letters,\nas shown, make up a real English word or not.\n\nIf they do make up a real English word, then you should\npress the far left button to indicate "YES, they do".  If they\nsimply make up a nonsense word or something that looks\nlike a real word but is badly miss-spelled, you would\npress the far right button to indicate "NO, they don''t.\n\nPress any key to continue.';
-instructions{2} = 'Once we start, the words and non-words will keep\ncoming non-stop, with a short delay between each\nitem.  After 20 items, the computer will  halt and\nsignal a rest.  Try to respond as  quickly as you\ncan while still remaining accurate.\n\nThe general sequence will be like this:\n  1. The screen will be blank.\n 2. As quickly as you can, determine if the letters form a\nreal word or not.\n 3. As quickly as you can, press ''left'' if they make a real word\nor ''right'' if they do not.\n 4. The computer responds with "correct" or "no", meaning\nthat your response was either correct or incorrect.\n 5. The letters linger for a moment then the screen goes\nblank and you go back to step #1.\nIf you feel ready, press any key to try a few examples ...';
-instructions{3} = 'Here are 2 sample questions.\nPress "left" if the letters make up a real English word.\nPress "right" if the letters do not.\n\nPress any key to continue.';
+instructions{1} = 'In the following task, you will be making judgments about\nsingle words.\n\nGroups of 5 to 7 letters will appear in the centre of the\nscreen and remain there for several seconds.  Your job is\nto decide as quickly as you can whether these letters,\nin the shown order, make up a real English word or not.\n\nIf they do make up a real English word, then you should\npress the left (''yes'') button to indicate "YES, they do".  If they\nsimply make up a nonsense word or something that looks\nlike a real word but is badly miss-spelled, you would\npress the right (''no'') button to indicate "NO, they don''t.\n\nPress any key to continue.';
+instructions{2} = 'Once we start, the words and non-words will keep\ncoming non-stop, with a short delay between each\nitem.  After 20 items, the computer will  halt and\nsignal a rest.  Try to respond as  quickly as you\ncan while still remaining accurate.\n\nThe general sequence will be like this:\n  1. The screen will be blank.\n 2. As quickly as you can, determine if the letters form a\nreal word or not.\n 3. As quickly as you can, press ''yes'' if they make a real word\nor ''no'' if they do not.\n 4. The computer responds with "correct" or "no", meaning\nthat your response was either correct or incorrect.\n 5. The letters linger for a moment then the screen goes\nblank and you go back to step #1.\nIf you feel ready, press any key to try a few examples ...';
+instructions{3} = 'Here are 2 sample questions.\nPress ''yes'' if the letters make up a real English word.\nPress ''no'' if the letters do not.\n\nPress any key to continue.';
 
 %% Experiment
 try
@@ -175,6 +173,7 @@ try
         Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour,displayRect, 32, 2);
     else
+        % Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour);
     end
     ListenChar(0);
@@ -437,6 +436,7 @@ try
             Screen('Flip',win);
             KbReleaseWait(-1);
             KbPressWait(-1);
+            KbReleaseWait(-1);
         end
         
     end

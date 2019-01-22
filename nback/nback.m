@@ -58,7 +58,6 @@ if justTesting
     rundate = datestr(now, 'yyyymmdd-HHMMSS');
     filename = strcat('nback_', rundate, '_', p_number, '.txt');
     mfilename = strcat('nback_', rundate, '_', p_number, '.mat');
-    sex = 'FM';
     age = '99';
     handedness = 'LR';
 else
@@ -77,13 +76,12 @@ else
             WaitSecs(1);
         end
     end
-    sex = input('Sex (M/F): ','s');
     age = input('Age: ');
     handedness = input('Handedness (L/R): ','s');
 end
 
 % Store this participant's info in participant_info.txt
-run_line = [num2str(p_number) ', ' datestr(now) ', ' sex ', ' handedness ', ' num2str(age) ', ' inputDevice];
+run_line = [num2str(p_number) ', ' datestr(now) ', ' handedness ', ' num2str(age) ', ' inputDevice];
 dlmwrite('nbackparticipants.txt',run_line,'delimiter','', '-append');
 
 ListenChar(0);
@@ -91,7 +89,7 @@ ListenChar(0);
 %% Run parameters
 bgColour = [0 0 0];
 textColour = [255 255 255];
-stimSize = 48; % Size for stimuli (warning + fixation)
+stimSize = 96; % Size for stimuli (warning + fixation)
 stimColour = [255 255 255];
 textSize = 24; % Size for instructions and block messages
 e = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -133,6 +131,7 @@ try
         Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour,displayRect, 32, 2);
     else
+        % Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour);
     end
     ListenChar(0);

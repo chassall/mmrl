@@ -63,7 +63,7 @@ participantData = [];
 if justTesting
     p_number = '99';
     rundate = datestr(now, 'yyyymmdd-HHMMSS');
-    filename = strcat('msit_', rundate, '_', p_number, '.txt');
+    filename = strcat('msitlong_', rundate, '_', p_number, '.txt');
     age = '99';
     handedness = 'LR';
 else
@@ -71,7 +71,7 @@ else
         clc;
         p_number = input('Enter the participant number:\n','s');  % get the subject name/number
         rundate = datestr(now, 'yyyymmdd-HHMMSS');
-        filename = strcat('msit_', rundate, '_', p_number, '.txt');
+        filename = strcat('msitlong_', rundate, '_', p_number, '.txt');
         checker1 = ~exist(filename,'file');
         checker2 = isnumeric(str2double(p_number)) && ~isnan(str2double(p_number));
         if checker1 && checker2
@@ -87,7 +87,7 @@ end
 
 % Store this participant's info in participant_info.txt
 run_line = [num2str(p_number) ', ' datestr(now) ', ' handedness ', ' num2str(age) ', ' inputDevice];
-dlmwrite('msitparticipants.txt',run_line,'delimiter','', '-append');
+dlmwrite('msitlongparticipants.txt',run_line,'delimiter','', '-append');
 
 ListenChar(0);
 
@@ -441,7 +441,7 @@ try
             responseCorrect = -1; % Invalid response
             responseTime = -1;
             startTime = GetSecs();
-            while GetSecs() - startTime < 1.75 %% ISI??
+            while GetSecs() - startTime < 2
                 
                 if ~madeResponse
                     

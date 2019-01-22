@@ -58,7 +58,6 @@ if justTesting
     rundate = datestr(now, 'yyyymmdd-HHMMSS');
     filename = strcat('srt_', rundate, '_', p_number, '.txt');
     mfilename = strcat('srt_', rundate, '_', p_number, '.mat');
-    sex = 'FM';
     age = '99';
     handedness = 'LR';
 else
@@ -77,13 +76,12 @@ else
             WaitSecs(1);
         end
     end
-    sex = input('Sex (M/F): ','s');
     age = input('Age: ');
     handedness = input('Handedness (L/R): ','s');
 end
 
 % Store this participant's info in participant_info.txt
-run_line = [num2str(p_number) ', ' datestr(now) ', ' sex ', ' handedness ', ' num2str(age) ', ' inputDevice];
+run_line = [num2str(p_number) ', ' datestr(now) ', ' handedness ', ' num2str(age) ', ' inputDevice];
 dlmwrite('srtparticipants.txt',run_line,'delimiter','', '-append');
 
 ListenChar(0);
@@ -93,9 +91,9 @@ bgColour = [0 0 0];
 textColour = [255 255 255];
 fixationCharacter = '+';
 warningText = '|||';
-stimSize = 48; % Size for stimuli (warning + fixation)
+stimSize = 96; % Size for stimuli (warning + fixation)
 stimColour = [255 255 255];
-textSize = 24; % Size for instructions and block messages
+textSize = 32; % Size for instructions and block messages
 
 % Blocks, trials, trial types
 nBlocks = 5; % Number of blocks
@@ -107,7 +105,7 @@ for i = 1:nBlocks
 end
 
 % Instructions
-instructions{1} = 'In this task, a warning stimulus (|||) will be presented followed by a target stimulus (+).\n\nUsing the index finger of your preferred hand, press the far left key AS QUICKLY AS POSSIBLE when the target stimulus (+) appears on the screen.\n\nReturn your finger to the STARTING DOT immediately after responding.\n\nPress the SPACEBAR on the keyboard to begin with a few PRACTICE TRIALS.';
+instructions{1} = 'In this task, a warning stimulus (|||) will be presented followed by a target stimulus (+).\n\nUsing the index finger of your preferred hand,\npress the far left key AS QUICKLY AS POSSIBLE\nwhen the target stimulus (+) appears on the screen.\n\nReturn your finger to the STARTING DOT immediately after responding.\n\nPress the SPACEBAR on the keyboard to begin with a few PRACTICE TRIALS.';
 
 % Instruction images
 srtInst1 = imread('SRTinst1.bmp');
@@ -120,6 +118,7 @@ try
         Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour,displayRect, 32, 2);
     else
+        % Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour);
     end
     ListenChar(0);
@@ -178,6 +177,14 @@ try
         Screen('TextSize',win,stimSize);
         DrawFormattedText(win,fixationCharacter,'center','center',stimColour);
         Screen('Flip',win);
+        
+        % Check for escape key
+        [keyIsDown, ~, keyCode] = KbCheck();
+        if keyCode(ExitKey)
+            ME = MException('ct:escapekeypressed','Exiting script');
+            throw(ME);
+        end
+        
         WaitSecs(3);
     end
     

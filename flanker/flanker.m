@@ -26,7 +26,7 @@ try
     WaitSecs(1);
     useResponseBox = 1;
     inputDevice = 'srb';
-    whichResponseCodes = [1 16]; % For left, right button 
+    whichResponseCodes = [1 2]; % For left, right button 
 catch e
     disp('Connection failed. Press p to proceed with keyboard input (f-key, j-key), or press escape to quit.');
     useResponseBox = 0;
@@ -57,7 +57,6 @@ if justTesting
     p_number = '99';
     rundate = datestr(now, 'yyyymmdd-HHMMSS');
     filename = strcat('flanker_', rundate, '_', p_number, '.txt');
-    sex = 'FM';
     age = '99';
     handedness = 'LR';
 else
@@ -75,13 +74,12 @@ else
             WaitSecs(1);
         end
     end
-    sex = input('Sex (M/F): ','s');
     age = input('Age: ');
     handedness = input('Handedness (L/R): ','s');
 end
 
 % Store this participant's info in participant_info.txt
-run_line = [num2str(p_number) ', ' datestr(now) ', ' sex ', ' handedness ', ' num2str(age) ', ' inputDevice];
+run_line = [num2str(p_number) ', ' datestr(now) ', ' handedness ', ' num2str(age) ', ' inputDevice];
 dlmwrite('flankerparticipants.txt',run_line,'delimiter','', '-append');
 
 ListenChar(0);
@@ -89,13 +87,13 @@ ListenChar(0);
 %% Run parameters
 bgColour = [0 0 0];
 textColour = [255 255 255];
-fixationSize = 48; % Size for fixation '+'
+fixationSize = 96; % Size for fixation '+'
 fixationCharacter = '+';
-stimSize = 48; % Size for stimuli
+stimSize = 96; % Size for stimuli
 stimStrings = {'< < < < <','> > < > >','> > > > >','< < > < <'};
 stimColour = [255 255 255];
 correctResponses = [1 1 2 2]; % 1:left, 2:right
-textSize = 24; % Size for instructions and block messages
+textSize = 48; % Size for instructions and block messages
 
 % Blocks, trials, trial types
 nBlocks = 3; % Number of blocks
@@ -108,8 +106,8 @@ for b = 1:nBlocks
 end
 
 % Instructions
-instructions{1} = 'In this task, you will see a row of 5 arrows.\n\nYour task is to pay attention to the MIDDLE arrow, and press the far left button if it is pointing to the left; or press the far right button if it is pointing to the right.\n\nPress the button AS QUICKLY AS POSSIBLE.\n\n(Press the spacebar to continue)';
-instructions{2} = 'For example, if you saw:\n\n> > < > >\n\nyou would press ''left''.\n\nIf you saw:\n\n> > > > >\n\nyou would press ''right''.\n\nIf you saw\n\n< < > < <\n\nyou would press ''right''.\n\nIgnore all of the arrows except the MIDDLE one!\n\n(Press the spacebar when you are ready to begin)';
+instructions{1} = 'In this task, you will see a row of 5 arrows.\n\nYour task is to pay attention to the MIDDLE arrow,\nand press the ''A'' button if it is pointing to the left\nor press the ''B'' button if it is pointing to the right.\n\nUsing your dominant hand, press the button\nAS QUICKLY AS POSSIBLE.\nReturn to the home position between trials.\n\n(Press the spacebar to continue)';
+instructions{2} = 'For example, if you saw:\n> > < > >\nyou would press ''A''.\nIf you saw:\n> > > > >\nyou would press ''B''.\nIf you saw\n< < > < <\nyou would press ''B''.\n\nIgnore all of the arrows except the MIDDLE one!\n(Press the spacebar when you are ready to begin)';
 
 %% Experiment
 try
@@ -118,6 +116,7 @@ try
         Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour,displayRect, 32, 2);
     else
+        % Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour);
     end
     ListenChar(0);
@@ -267,6 +266,7 @@ try
             Screen('Flip',win);
             KbReleaseWait(-1);
             KbPressWait(-1);
+            KbReleaseWait(-1);
         end
         
     end

@@ -58,7 +58,6 @@ if justTesting
     rundate = datestr(now, 'yyyymmdd-HHMMSS');
     filename = strcat('tap_', rundate, '_', p_number, '.txt');
     mfilename = strcat('tap_', rundate, '_', p_number, '.mat');
-    sex = 'FM';
     age = '99';
     handedness = 'LR';
 else
@@ -77,13 +76,12 @@ else
             WaitSecs(1);
         end
     end
-    sex = input('Sex (M/F): ','s');
     age = input('Age: ');
     handedness = input('Handedness (L/R): ','s');
 end
 
 % Store this participant's info in participant_info.txt
-run_line = [num2str(p_number) ', ' datestr(now) ', ' sex ', ' handedness ', ' num2str(age) ', ' inputDevice];
+run_line = [num2str(p_number) ', ' datestr(now) ', ' handedness ', ' num2str(age) ', ' inputDevice];
 dlmwrite('tapparticipants.txt',run_line,'delimiter','', '-append');
 
 %% Run parameters
@@ -93,9 +91,9 @@ goColour = [0 255 0];
 stopColour = [255 0 0];
 fixationCharacter = '+';
 warningText = '|||';
-stimSize = 48; % Size for stimuli (warning + fixation)
+stimSize = 96; % Size for stimuli (warning + fixation)
 stimColour = [255 255 255];
-textSize = 24; % Size for instructions and block messages
+textSize = 32; % Size for instructions and block messages
 
 % Blocks, trials, trial types
 % Run Time
@@ -103,7 +101,7 @@ nBlocks = 6; % Number of blocks (should be a multiple of two)
 tapTime = 15; % Time in seconds
 blockTypes = [ones(1,nBlocks/2) 2*ones(1,nBlocks/2)]; % 1 = left, 2 = right
 blockTypes = Shuffle(blockTypes);
-conditionStrings = {'left','LEFT'; 'right','RIGHT'};
+conditionStrings = {'left','far LEFT'; 'right','far RIGHT'};
 
 % Instructions
 instructions{1} = 'In this task, we are going to see how fast you can tap.\nYou will use the labelled keys on the response box in front of you.\n\n(press spacebar to continue)';
@@ -115,6 +113,7 @@ try
         Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour,displayRect, 32, 2);
     else
+        % Screen('Preference', 'SkipSyncTests', 1);
         [win, rec] = Screen('OpenWindow', 0, bgColour);
     end
     ListenChar(0);
